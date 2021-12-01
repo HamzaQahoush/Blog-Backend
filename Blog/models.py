@@ -1,5 +1,6 @@
 from Blog import app, db
 from datetime import datetime
+from sqlalchemy.orm import validates
 
 
 class Post(db.Model):
@@ -20,12 +21,29 @@ class Post(db.Model):
         return f'{self.title} {self.body}'
 
     def json_convert(self):
-        return {"id": self.id, "title": self.title, "body": self.body, "image": self.image, "author": self.author}
-# class PostSchema(ma.Schema):
-# #     class meta:
-# #         fields = ('id', 'title', 'body', 'image', 'author', 'date')
-#
+        return {"id": self.id, "title": self.title, "body": self.body, "image": self.image, "author": self.author,
+                "date": self.date}
 
-#
-# post_schema = PostSchema(strict=True)  # for one article
-# posts_schema = PostSchema(many=True)  # to query all the articles
+    @validates('title')
+    def validate_title(self,key,title):
+        if not title:
+            raise AssertionError('No title provided')
+        if len(title) < 5 or len(title) > 15:
+            raise AssertionError('title must be between 5 and 15 characters')
+        return title @ validates('title')
+
+    @validates('body')
+    def validate_body(self, key , body):
+        if not body:
+            raise AssertionError('No title provided')
+        if len(body) < 5 or len(body) > 15:
+            raise AssertionError('body must be between 5 and 250 characters')
+        return body @ validates('body')
+
+    @validates('author')
+    def validate_author(self, key, author):
+        if not author:
+            raise AssertionError('No author provided')
+        if len(author) < 5 or len(self.author) > 15:
+            raise AssertionError('author must be between 4 and 15 characters')
+        return author @ validates('author')
