@@ -24,26 +24,26 @@ class Post(db.Model):
         return {"id": self.id, "title": self.title, "body": self.body, "image": self.image, "author": self.author,
                 "date": self.date}
 
-    @validates('title')
-    def validate_title(self,key,title):
-        if not title:
-            raise AssertionError('No title provided')
-        if len(title) < 5 or len(title) > 15:
-            raise AssertionError('title must be between 5 and 15 characters')
-        return title @ validates('title')
-
-    @validates('body')
-    def validate_body(self, key , body):
-        if not body:
-            raise AssertionError('No title provided')
-        if len(body) < 5 or len(body) > 15:
-            raise AssertionError('body must be between 5 and 250 characters')
-        return body @ validates('body')
-
-    @validates('author')
-    def validate_author(self, key, author):
-        if not author:
-            raise AssertionError('No author provided')
-        if len(author) < 5 or len(self.author) > 15:
-            raise AssertionError('author must be between 4 and 15 characters')
-        return author @ validates('author')
+    # @validates('title')
+    # def validate_title(self, key, title):
+    #     if not title:
+    #         raise AssertionError('No title provided')
+    #     if len(title) < 5 or len(title) > 15:
+    #         raise AssertionError('title must be between 5 and 15 characters')
+    #     return title
+    #
+    # @validates('body')
+    # def validate_body(self, key, body):
+    #     if not body:
+    #         raise AssertionError('No body provided')
+    #     if len(body) < 5 or len(body) > 240:
+    #         raise AssertionError('body must be between 5 and 250 characters')
+    #     return body
+    #
+    # @validates('author')
+    # def validate_author(self, key, author):
+    #     if not author:
+    #         raise AssertionError('No author provided')
+    #     if len(author) < 5 or len(author) > 20:
+    #         raise AssertionError('author must be between 4 and 15 characters')
+    #     return author
