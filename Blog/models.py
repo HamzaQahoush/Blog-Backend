@@ -9,7 +9,7 @@ class Post(db.Model):
     body = db.Column(db.String(length=1024), nullable=False)
     image = db.Column(db.String(), nullable=True)
     author = db.Column(db.String(length=30), nullable=False)
-    date = db.Column(db.DateTime, default=datetime.utcnow())
+    date = db.Column(db.DateTime, default=datetime.utcnow(),onupdate=datetime.now)
 
     def __init__(self, title, body, image, author):
         self.title = title

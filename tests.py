@@ -2,8 +2,6 @@ from Blog import app, db
 from Blog.models import Post
 import unittest
 import requests
-import json
-from flask import Flask, session
 
 
 class ApiTest(unittest.TestCase):
@@ -12,7 +10,6 @@ class ApiTest(unittest.TestCase):
     post_obj = {
         "author": "hamzsa",
         "body": "This is body tested new test added",
-        "date": "Wed, 01 Dec 2021 20:32:57 GMT",
         "id": 19,
         "image": "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg",
         "title": "Hello tested world "
@@ -27,7 +24,6 @@ class ApiTest(unittest.TestCase):
     updated_post_after = {
         "author": "Ali",
         "body": "This is body updated",
-        "date": "Wed, 01 Dec 2021 20:32:57 GMT",
         "id": 19,
         "image": "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg",
         "title": "This updated"
@@ -39,13 +35,6 @@ class ApiTest(unittest.TestCase):
         "title": ""
     }
 
-    def setUp(self):
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
-        db.create_all()
-
-    def tearDown(self):
-        db.session.remove()
-        db.drop_all()
 
     def test_get_all_post(self, ):
         r = requests.get(ApiTest.get_posts_URL)
@@ -56,16 +45,18 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(r.status_code, 201)
 
     def test_get_added_post(self):
-        # last_item = db.posts.query(Post).order_by(Post.id.desc()).first()
-        # print(last_item, 'id')
-        r = requests.get(f'{ApiTest.API_URL}get/{ApiTest.post_obj["id"]}')
+        last_item_id = db.session.query(Post).order_by(Post.id.desc()).first().id
+        r = requests.get(f'{ApiTest.API_URL}get/{last_item_id}')
         self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.json()['post'], ApiTest.post_obj)
+        new_r = r.json()['post']
+        del new_r['date']
+        self.assertEqual(new_r, ApiTest.post_obj)
 
-    # def test_add_invalid_post(self):
-    #     r = requests.post('http://127.0.0.1:4000/add', json=ApiTest.invalid_add)
-    #
-    #     self.assertEqual(r.status_code, 400)
+    @unittest.expectedFailure
+    def test_add_invalid_post(self):
+        r = requests.post('http://127.0.0.1:4000/add', json=ApiTest.invalid_add)
+
+        self.assertEqual(r.status_code, 400)
 
     def test_update_existing_post(self):
         r = requests.put(f'{ApiTest.API_URL}update/{ApiTest.post_obj["id"]}', json=ApiTest.updated_post)
@@ -74,7 +65,9 @@ class ApiTest(unittest.TestCase):
     def test_get_post_after_updating(self):
         r = requests.get(f'{ApiTest.API_URL}get/{ApiTest.post_obj["id"]}')
         self.assertEqual(r.status_code, 200)
-        self.assertDictEqual(r.json()['post'], ApiTest.updated_post_after)
+        new_r = r.json()['post']
+        del new_r['date']
+        self.assertDictEqual(new_r, ApiTest.updated_post_after)
 
     def test_delete_post(self):
         r = requests.delete(f'{ApiTest.API_URL}delete/{ApiTest.post_obj["id"]}')
