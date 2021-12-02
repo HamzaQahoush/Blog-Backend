@@ -27,8 +27,8 @@ def get_posts():
 
 # add to database
 @app.route('/add', methods=["POST"])
-@expects_json(schema)
 @cross_origin()
+# @expects_json(schema) //  to handle validation backend
 def home_page():
     if request.method == 'POST':
         title = request.json['title']
